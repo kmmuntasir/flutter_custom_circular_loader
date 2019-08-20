@@ -28,18 +28,19 @@ class MyApp extends StatelessWidget {
 Widget loader = CustomCircularLoader(
   coveredPercent: 65,
   circleHeader: "Total",
-  circleSize: 198.0,
+  circleSize: 200.0,
   circleWidth: 5.0,
   headerInBottom: true,
+  animationDuration: 1000,
   circleColor: Colors.grey[100],
   coveredCircleColor: Colors.red,
   coveredPercentStyle: TextStyle(
-      fontSize: 24.0,
+      fontSize: 44.0,
       fontWeight: FontWeight.w600,
       color: Colors.red
   ),
   circleHeaderStyle: TextStyle(
-      fontSize: 12.0,
+      fontSize: 22.0,
       fontWeight: FontWeight.w400,
       color: Colors.grey[900]
   ),

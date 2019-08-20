@@ -18,7 +18,7 @@ class CustomCircularLoader extends StatefulWidget {
     this.circleStart,
     this.headerInBottom,
     this.circleContent,
-    this.noHeader,
+    this.animationDuration,
     @required this.circleSize,
     @required this.circleWidth,
     @required this.circleColor,
@@ -53,8 +53,8 @@ class CustomCircularLoader extends StatefulWidget {
   // shown in the circle
   final Widget circleContent;
 
-  // If set to true, only percentage text will be shown
-  final bool noHeader;
+  // Animation duration in milliseconds. Disabled if no duration is provided
+  final int animationDuration;
 
   // Circle Widget size
   final double circleSize;
@@ -69,7 +69,6 @@ class CustomCircularLoader extends StatefulWidget {
   final Color coveredCircleColor;
 
   // The header text inside the circle
-  // If noHeader is set to false (not provided), circleHeader must be provided
   final String circleHeader;
 
   // The unit character for percentage display (default is '%')
@@ -89,7 +88,8 @@ class CustomCircularLoader extends StatefulWidget {
 class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProviderStateMixin {
   Animation<double> _animation;
   AnimationController controller;
-  double percentValue = 10;
+  double percentValue;
+  double gapValue;
 
 
   double innerCircleRadius;
@@ -102,6 +102,8 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
 
     innerCircleRadius = (widget.circleSize - (2 * widget.circleWidth))/2;
     containerSize = sqrt(2 * innerCircleRadius * innerCircleRadius);
+    percentValue = widget.coveredPercent;
+    gapValue = (widget.gap != null) ? widget.gap : ((widget.circleHeader != null) ? 10 : 0);
 
     if(widget.circleStart == "top") circleStartPoint = 1.5;
     else if(widget.circleStart == "bottom") circleStartPoint = 0.5;
@@ -109,22 +111,25 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
     else if(widget.circleStart == "left") circleStartPoint = 1;
     else circleStartPoint = 1.5;
 
-    controller = AnimationController(
-        duration: Duration(milliseconds: 1000),
-        vsync: this
-    );
-    controller.forward();
+    if(widget.animationDuration != null) {
+      controller = AnimationController(
+          duration: Duration(milliseconds: widget.animationDuration),
+          vsync: this
+      );
+
+      controller.forward();
+
+      _animation = Tween(begin: 0.0, end: widget.coveredPercent).animate(controller)
+        ..addListener(() {
+          setState(() {
+            percentValue = _animation.value;
+          });
+        });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
-    _animation = Tween(begin: 0.0, end: widget.coveredPercent).animate(controller)
-      ..addListener(() {
-        setState(() {
-          percentValue = _animation.value;
-        });
-      });
 
     return Container(
       width: widget.circleSize,
@@ -172,7 +177,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
       ],
     );
 
-    Widget headerText = (widget.noHeader != null && widget.noHeader != false) ? Container() : Text(
+    Widget headerText = (widget.circleHeader == null) ? Container() : Text(
       widget.circleHeader,
       textAlign: TextAlign.center,
       style: widget.circleHeaderStyle,
@@ -185,7 +190,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           percentageText,
-          SizedBox(height: (widget.gap != null) ? widget.gap : 10),
+          SizedBox(height: gapValue),
           headerText,
         ],
       );
@@ -196,7 +201,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           headerText,
-          SizedBox(height: (widget.gap != null) ? widget.gap : 10),
+          SizedBox(height: gapValue),
           percentageText,
         ],
       );
