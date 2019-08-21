@@ -103,7 +103,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
     innerCircleRadius = (widget.circleSize - (2 * widget.circleWidth))/2;
     containerSize = sqrt(2 * innerCircleRadius * innerCircleRadius);
     percentValue = widget.coveredPercent;
-    gapValue = (widget.gap != null) ? widget.gap : ((widget.circleHeader != null) ? 10 : 0);
+    gapValue = widget.gap ?? ((widget.circleHeader != null) ? 10 : 0);
 
     if(widget.circleStart == "top") circleStartPoint = 1.5;
     else if(widget.circleStart == "bottom") circleStartPoint = 0.5;
@@ -155,7 +155,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
           Container(
               width: containerSize,
               height: containerSize,
-              child: (widget.circleContent != null) ? widget.circleContent : defaultContent(),
+              child: widget.circleContent ?? defaultContent(),
           ),
         ],
       ),
@@ -171,7 +171,7 @@ class _CircularLoader extends State<CustomCircularLoader> with SingleTickerProvi
           style: widget.coveredPercentStyle,
         ),
         Text(
-            (widget.unit != null) ? widget.unit : "%",
+            widget.unit ?? "%",
             style: widget.coveredPercentStyle
         ),
       ],
